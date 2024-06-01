@@ -1,5 +1,10 @@
-## 과제: TODO List 서비스_김태영
+# 과제: TODO List 서비스_김태영
 
+---
+### Swagger Document: http://13.124.251.51:8080/swagger-ui/index.html#
+### H2 Database: http://13.124.251.51:8080/h2
+### Server Address: http://13.124.251.51:8080/
+---
 
 ### 기술 스택: Java + Spring Boot + H2
 ![제목 없는 다이어그램](https://github.com/gnidinger/moais_assignment_todolist/assets/13742045/e8fe3bd8-9b8d-4aec-a514-0234d7f82a50)
