@@ -1,0 +1,36 @@
+server:
+  port: 8080
+spring:
+  application:
+    name: assignment
+  h2:
+    console:
+      enabled: true
+      path: /h2
+  jpa:
+    hibernate:
+      ddl-auto: update
+  datasource:
+    url: jdbc:h2:mem:test
+    driver-class-name: org.h2.Driver
+    username: sa
+    password:
+    properties:
+      rewriteBatchedStatements: true
+  logging:
+    level:
+      root: TRACE
+      org.springframework: TRACE
+      org.hibernate: TRACE
+
+jwt:
+  token:
+    secret-key: ThisIsSecretKeyOfAssignmentProjectThatHS512SignatureAlgorithmThatMUSTHave64ByteLengthForGeneratingJWT
+    expiration-minutes: 480 # Minutes
+
+springbootjjwt:
+  password:
+    encoder:
+      secret: mysecret
+      iteration: 33
+      keylength: 256
