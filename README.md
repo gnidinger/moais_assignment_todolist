@@ -46,4 +46,10 @@
 - Todolist의 상태 변경과 별개로 항목의 제목과 설명을 업데이트 하는 기능이 구현되어 있습니다.
 - Swagger를 이용한 문서화 코드가 작성되어 있습니다.
 
+### 확장 가능한 코드&아키텍처
+
+![제목 없는 다이어그램-페이지-2](https://github.com/gnidinger/moais_assignment_todolist/assets/13742045/1bf691d8-0029-444e-956d-7739790f1c28)
+
+- 비관적 락(Pessimistic Lock)의 경우 @Lock 애너테이션 사용
+- 낙관적 락(Optimistic Lock)의 경우 @Version 애너테이션 사용
 
