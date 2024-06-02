@@ -12,6 +12,10 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
 import com.example.assignment.domain.todolist.dto.TodolistDto;
 import com.example.assignment.domain.todolist.entity.Todolist;
@@ -21,6 +25,7 @@ import com.example.assignment.domain.todolist.repository.TodolistRepository;
 import com.example.assignment.domain.todolist.service.TodolistService;
 import com.example.assignment.domain.user.entity.AmUser;
 import com.example.assignment.domain.user.entity.enums.AuthType;
+import com.example.assignment.global.dto.response.MultiResponseDto;
 import com.example.assignment.global.error.exception.BusinessLogicException;
 import com.example.assignment.global.error.exception.ExceptionCode;
 
@@ -139,6 +144,7 @@ public class TodolistServiceTest {
 			.build();
 
 		List<Todolist> todolists = List.of(todolist1, todolist2);
+		Page<Todolist> page = new PageImpl<>(todolists, PageRequest.of(0, 8), todolists.size());
 
 		TodolistDto.ListTodolistResponse response1 = new TodolistDto.ListTodolistResponse();
 		response1.setSeq(todolist1.getSeq());
@@ -150,18 +156,18 @@ public class TodolistServiceTest {
 
 		List<TodolistDto.ListTodolistResponse> expectedResponses = List.of(response1, response2);
 
-		when(todolistRepository.findByUserOrderByCreatedAtDesc(user)).thenReturn(todolists);
+		when(todolistRepository.findByUserOrderByCreatedAtDesc(eq(user), any(Pageable.class))).thenReturn(page);
 		when(todolistMapper.toRetrieveTodolistResponseList(anyList())).thenReturn(expectedResponses);
 
 		// When
-		List<TodolistDto.ListTodolistResponse> responses = todolistService.retrieveTodolists(user);
+		MultiResponseDto<TodolistDto.ListTodolistResponse> responses = todolistService.retrieveTodolists(user, 1, 8);
 
 		// Then
 		assertNotNull(responses);
-		assertEquals(expectedResponses.size(), responses.size());
-		assertEquals(expectedResponses.get(0).getSeq(), responses.get(0).getSeq());
-		assertEquals(expectedResponses.get(0).getTitle(), responses.get(0).getTitle());
-		verify(todolistRepository, times(1)).findByUserOrderByCreatedAtDesc(user);
+		assertEquals(expectedResponses.size(), responses.getData().size());
+		assertEquals(expectedResponses.get(0).getSeq(), responses.getData().get(0).getSeq());
+		assertEquals(expectedResponses.get(0).getTitle(), responses.getData().get(0).getTitle());
+		verify(todolistRepository, times(1)).findByUserOrderByCreatedAtDesc(eq(user), any(Pageable.class));
 		verify(todolistMapper, times(1)).toRetrieveTodolistResponseList(anyList());
 	}
 

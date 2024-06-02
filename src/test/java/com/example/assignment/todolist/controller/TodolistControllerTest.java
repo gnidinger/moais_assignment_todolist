@@ -13,6 +13,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
@@ -28,6 +32,7 @@ import com.example.assignment.domain.user.annotation.AmUserArgumentResolver;
 import com.example.assignment.domain.user.entity.AmUser;
 import com.example.assignment.domain.user.entity.enums.AuthType;
 import com.example.assignment.domain.user.service.AmUserService;
+import com.example.assignment.global.dto.response.MultiResponseDto;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 @WithMockUser
@@ -126,13 +131,26 @@ public class TodolistControllerTest {
 		listResponse.setTitle("코드 작성");
 		listResponse.setStatus(TodoStatus.TODO.name());
 
-		Mockito.when(todolistService.retrieveTodolists(Mockito.any(AmUser.class))).thenReturn(Collections.singletonList(listResponse));
+		Page<TodolistDto.ListTodolistResponse> pageResponse = new PageImpl<>(
+			Collections.singletonList(listResponse), PageRequest.of(0, 8), 1);
 
-		mockMvc.perform(get("/api/todolist"))
+		MultiResponseDto<TodolistDto.ListTodolistResponse> multiResponse = new MultiResponseDto<>(
+			pageResponse.getContent(), pageResponse);
+
+		Mockito.when(todolistService.retrieveTodolists(Mockito.any(AmUser.class), Mockito.anyInt(), Mockito.anyInt()))
+			.thenReturn(multiResponse);
+
+		mockMvc.perform(get("/api/todolist")
+				.param("page", "1")
+				.param("size", "8"))
 			.andExpect(status().isOk())
-			.andExpect(jsonPath("$[0].seq").value(1L))
-			.andExpect(jsonPath("$[0].title").value("코드 작성"))
-			.andExpect(jsonPath("$[0].status").value(TodoStatus.TODO.name()));
+			.andExpect(jsonPath("$.data[0].seq").value(1L))
+			.andExpect(jsonPath("$.data[0].title").value("코드 작성"))
+			.andExpect(jsonPath("$.data[0].status").value(TodoStatus.TODO.name()))
+			.andExpect(jsonPath("$.pageInfo.page").value(1))
+			.andExpect(jsonPath("$.pageInfo.size").value(8))
+			.andExpect(jsonPath("$.pageInfo.totalElements").value(1))
+			.andExpect(jsonPath("$.pageInfo.totalPages").value(1));
 	}
 
 	@Test

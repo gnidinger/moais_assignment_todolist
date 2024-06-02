@@ -9,6 +9,8 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import com.example.assignment.domain.todolist.entity.Todolist;
@@ -93,11 +95,13 @@ public class TodolistRepositoryTest {
 		todolistRepository.save(todolist2);
 
 		// When
-		List<Todolist> todolists = todolistRepository.findByUserOrderByCreatedAtDesc(user);
+		PageRequest pageRequest = PageRequest.of(0, 8); // 페이지 번호 0, 크기 8
+		Page<Todolist> todolistPage = todolistRepository.findByUserOrderByCreatedAtDesc(user, pageRequest);
 
 		// Then
-		assertNotNull(todolists);
-		assertEquals(2, todolists.size());
+		assertNotNull(todolistPage);
+		assertEquals(2, todolistPage.getTotalElements());
+		List<Todolist> todolists = todolistPage.getContent();
 		assertEquals(todolist2.getTitle(), todolists.get(0).getTitle());
 		assertEquals(todolist1.getTitle(), todolists.get(1).getTitle());
 	}

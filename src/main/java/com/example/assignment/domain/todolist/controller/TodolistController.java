@@ -1,7 +1,5 @@
 package com.example.assignment.domain.todolist.controller;
 
-import java.util.List;
-
 import javax.validation.Valid;
 
 import org.springframework.http.HttpStatus;
@@ -14,14 +12,17 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.assignment.domain.todolist.dto.TodolistDto;
 import com.example.assignment.domain.todolist.service.TodolistService;
 import com.example.assignment.domain.user.annotation.CurrentAmUser;
 import com.example.assignment.domain.user.entity.AmUser;
+import com.example.assignment.global.dto.response.MultiResponseDto;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -102,10 +103,14 @@ public class TodolistController {
 		return ResponseEntity.ok(response);
 	}
 
-	@GetMapping()
+	@GetMapping
 	@Operation(
 		summary = "모든 Todolist 조회",
 		description = "사용자의 모든 Todolist 항목을 조회합니다.",
+		parameters = {
+			@Parameter(name = "page", description = "페이지 번호 (기본값: 1)", required = false, schema = @Schema(type = "integer", defaultValue = "1")),
+			@Parameter(name = "size", description = "페이지 크기 (기본값: 8)", required = false, schema = @Schema(type = "integer", defaultValue = "8"))
+		},
 		responses = {
 			@ApiResponse(
 				responseCode = "200",
@@ -117,10 +122,13 @@ public class TodolistController {
 			)
 		}
 	)
-	public ResponseEntity<List<TodolistDto.ListTodolistResponse>> getAllTodolists(@CurrentAmUser AmUser currentUser) {
+	public ResponseEntity<MultiResponseDto<TodolistDto.ListTodolistResponse>> getAllTodolists(
+		@CurrentAmUser AmUser currentUser,
+		@RequestParam(defaultValue = "1") int page,
+		@RequestParam(defaultValue = "8") int size) {
 		log.info("모든 Todolist 조회 요청 - 사용자 ID: {}", currentUser.getId());
-		List<TodolistDto.ListTodolistResponse> response = todolistService.retrieveTodolists(currentUser);
-		log.info("모든 Todolist 조회 성공 - 사용자 ID: {}, 항목 수: {}", currentUser.getId(), response.size());
+		MultiResponseDto<TodolistDto.ListTodolistResponse> response = todolistService.retrieveTodolists(currentUser, page, size);
+		log.info("모든 Todolist 조회 성공 - 사용자 ID: {}, 항목 수: {}", currentUser.getId(), response.getData().size());
 
 		return ResponseEntity.ok(response);
 	}

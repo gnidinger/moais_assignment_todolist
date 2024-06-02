@@ -2,6 +2,8 @@ package com.example.assignment.domain.todolist.service;
 
 import java.util.List;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -10,6 +12,7 @@ import com.example.assignment.domain.todolist.entity.Todolist;
 import com.example.assignment.domain.todolist.mapper.TodolistMapper;
 import com.example.assignment.domain.todolist.repository.TodolistRepository;
 import com.example.assignment.domain.user.entity.AmUser;
+import com.example.assignment.global.dto.response.MultiResponseDto;
 import com.example.assignment.global.error.exception.BusinessLogicException;
 import com.example.assignment.global.error.exception.ExceptionCode;
 
@@ -45,11 +48,13 @@ public class TodolistService {
 	}
 
 	@Transactional(readOnly = true)
-	public List<TodolistDto.ListTodolistResponse> retrieveTodolists(AmUser user) {
+	public MultiResponseDto<TodolistDto.ListTodolistResponse> retrieveTodolists(AmUser user, int page, int size) {
 		log.info("모든 Todolist 조회 요청 - 사용자 ID: {}", user.getId());
-		List<Todolist> todolists = todolistRepository.findByUserOrderByCreatedAtDesc(user);
-		log.info("모든 Todolist 조회 성공 - 사용자 ID: {}, 항목 수: {}", user.getId(), todolists.size());
-		return todolistMapper.toRetrieveTodolistResponseList(todolists);
+		PageRequest pageRequest = PageRequest.of(page - 1, size);
+		Page<Todolist> todolistsPage = todolistRepository.findByUserOrderByCreatedAtDesc(user, pageRequest);
+		List<TodolistDto.ListTodolistResponse> responseList = todolistMapper.toRetrieveTodolistResponseList(todolistsPage.getContent());
+		log.info("모든 Todolist 조회 성공 - 사용자 ID: {}, 항목 수: {}", user.getId(), responseList.size());
+		return new MultiResponseDto<>(responseList, todolistsPage);
 	}
 
 	@Transactional
