@@ -40,6 +40,7 @@
 
 ### 추가 기능
 - 주요 진행에 따른 시스템 로깅이 되어있습니다.
+- Todolist 전체 조회시 생성일 기준 내림차순으로 페이지네이션이 구현되어 있습니다.
 - 회원 탈퇴시 관련 Todolist가 삭제되도록 구현되어 있습니다.
 - 컨트롤러, 서비스, 레포지토리 클래스의 모든 메서드에 대한 테스트코드가 작성되어 있습니다.
 - 매일 자정에 <상태가 'DONE'으로 바뀐 Todolist 중 2주가 지난 객체>를 자동 삭제하는 기능이 구현되어 있습니다.
@@ -47,8 +48,7 @@
 - Swagger를 이용한 문서화 코드가 작성되어 있습니다.
 
 ### 확장 가능한 코드&아키텍처
-
-![제목 없는 다이어그램-페이지-2](https://github.com/gnidinger/moais_assignment_todolist/assets/13742045/1bf691d8-0029-444e-956d-7739790f1c28)
+![제목 없는 다이어그램-페이지-3](https://github.com/gnidinger/moais_assignment_todolist/assets/13742045/012da46b-2425-4e21-9a86-904ee58f89f2)
 
 - 비관적 락(Pessimistic Lock)의 경우 @Lock 애너테이션 사용
 - 낙관적 락(Optimistic Lock)의 경우 @Version 애너테이션 사용
